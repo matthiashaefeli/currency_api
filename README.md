@@ -1,24 +1,32 @@
-# README
+# Currency API
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+Currency API provides a simple API, converting one currency to another in json format.
 
-Things you may want to cover:
+# How to set up locally
 
-* Ruby version
+```
+$ git clone
+$ cd
+$ bundle install
+$ rails db:create
+$ rails db:migrate
+```
 
-* System dependencies
+# Running the server
 
-* Configuration
+```
+$ rails s
+```
 
-* Database creation
+Run test suit
 
-* Database initialization
+```
+$ cd
+$ rspec
+```
 
-* How to run the test suite
+# Deploy to heroku
 
-* Services (job queues, cache servers, search engines, etc.)
+```
+```
 
-* Deployment instructions
-
-* ...
