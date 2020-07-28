@@ -4,7 +4,23 @@ class CurrenciesController < ApplicationController
 
   # GET /currencies
   def index
-    currencies = Currency.order(:created_at)
+    begin
+      currencies =
+        if params[:filter]
+          currency_name = CurrencyName.find_by(shortening: params[:filter])
+          Currency.where(currency: currency_name.title)
+        else
+          Currency.all
+        end
+
+      if params[:sort]
+        currencies = currencies.sort_by { |c| c.send(params[:sort]) }
+      end
+    rescue
+      payload = { error: 'Bad Request',
+                  status: 400 }
+      render json: payload, status: :bad_request and return
+    end
     render json: currencies, status: :ok
   end
 
