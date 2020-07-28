@@ -1,37 +1,38 @@
+# CurrenciesController
 class CurrenciesController < ApplicationController
   before_action :authenticate_request!
 
-  # get /currencies
+  # GET /currencies
   def index
     currencies = Currency.order(:created_at)
     render json: currencies, status: :ok
   end
 
-  # get /currencies/:id
+  # GET /currencies/:id
   def show
     if !Currency.exists?(params[:id])
       payload = { error: 'Currency with this id does not exists',
                   status: 400 }
-      render :json => payload, :status => :bad_request
+      render json: payload, status: :bad_request
     else
       render json: Currency.find(params[:id]), status: :ok
     end
   end
 
-  # post /currencies
+  # POST /currencies
   def create
     if CurrencyName.exists?(shortening: params[:currency])
       currencies = Connection.live
-      currency = currencies['quotes'].select { |k, v| k == 'USD'+params[:currency] }.flatten
+      currency = currencies['quotes'].select { |k, _| k == 'USD' + params[:currency] }.flatten
       save_currency(params[:currency], currency[1])
     else
-      payload =  { status: 400,
-                   error: "There is no currency with the name #{params[:currency]}" }
-      render :json => payload, :status => :bad_request
+      payload = { status: 400,
+                  error: "There is no currency with the name #{params[:currency]}" }
+      render json: payload, status: :bad_request
     end
   end
 
-  # delete /currencies
+  # DELETE /currencies
   def destroy
     currency = Currency.find(params[:id])
     currency.delete

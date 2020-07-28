@@ -21,8 +21,7 @@ RSpec.describe CurrenciesController, type: :controller do
 
     it 'wrong token' do
       @controller = UsersController.new
-      user = FactoryBot.create(:user)
-      token = auth_tokens_for_user(user)
+      FactoryBot.create(:user)
       @controller = CurrenciesController.new
       request.headers.merge!({ 'Authorization' => 'lfj' })
       get :index

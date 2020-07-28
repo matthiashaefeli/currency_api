@@ -1,12 +1,18 @@
 # Currency API
 
-Currency API provides a simple API, converting one currency to another in json format.
+Currency API provides a simple API, returns the value of a currency in json format.
+
+Stores the searched currency in the DB
+
+# Requirements
+
+This code has been run and tested by Ruby 2.7.0, Rails 6.0.3.2
 
 # How to set up locally
 
 ```
 $ git clone
-$ cd
+$ cd currency_api
 $ bundle install
 $ rails db:create
 $ rails db:migrate
@@ -18,10 +24,10 @@ $ rails db:migrate
 $ rails s
 ```
 
-Run test suit
+# Run test suit
 
 ```
-$ cd
+$ cd currency_api
 $ rspec
 ```
 
@@ -31,7 +37,7 @@ $ rspec
 ```
 
 # Create a User
-Code examples in Ruby
+## Ruby:
 
 ```
 require 'net/http'
@@ -51,8 +57,24 @@ response = Net::HTTP.start(uri.host, uri.port) do |http|
 end
 ```
 
+## Postman:
+
+POST: http://localhost:3000/users
+
+Headers: KEY: Content-Type VALUE: application/json
+
+Body: raw
+```
+{
+  "user": {
+    "email": "test@test.com",
+    "password": "1234"
+  }
+}
+```
+
 # Get Token
-Code examples in Ruby
+## Ruby:
 
 ```
 require 'net/http'
@@ -74,25 +96,110 @@ end
 token = JSON.parse(response.body)['auth_token']
 ```
 
-# route not sure yet
-Code examples in Ruby
+## Postman:
+
+POST: http://localhost:3000/users/login
+
+Headers: KEY: Content-Type VALUE: application/json
+
+Body: raw
+```
+{
+  "user": {
+    "email": "test@test.com",
+    "password": "1234"
+  }
+}
+```
+
+# Create Currency
+## Ruby:
 
 ```
 require 'net/http'
 require 'json'
 
-uri = URI('http://localhost:3000/users')
+uri = URI('http://localhost:3000/currencies/?currency=CHF')
+
+response = Net::HTTP.start(uri.host, uri.port) do |http|
+   req = Net::HTTP::Post.new(uri)
+   req['Content-Type'] = 'application/json'
+   req['Authorization'] = token
+   http.request(req)
+end
+```
+## Postman:
+
+POST: http://localhost:3000/currencies/
+
+Headers: KEY: Authorization VALUE: token
+
+PARAMS: KEY: currency VALUE: CHF
+
+
+# Show all stored Currencies
+## Ruby:
+
+```
+require 'net/http'
+require 'json'
+
+uri = URI('http://localhost:3000/currencies')
 
 response = Net::HTTP.start(uri.host, uri.port) do |http|
    req = Net::HTTP::Get.new(uri)
    req['Content-Type'] = 'application/json'
    req['Authorization'] = token
-   <!-- req.body = { "user": {
-                  "email": "test@test.com",
-                  "password": "1234"
-                }
-              }.to_json -->
+   http.request(req)
+end
+```
+## Postman:
+
+GET: http://localhost:3000/currencies
+
+Headers: KEY: Authorization VALUE: token
+
+# Show Currency
+## Ruby:
+
+```
+require 'net/http'
+require 'json'
+
+uri = URI('http://localhost:3000/currencies/1)
+
+response = Net::HTTP.start(uri.host, uri.port) do |http|
+   req = Net::HTTP::Get.new(uri)
+   req['Content-Type'] = 'application/json'
+   req['Authorization'] = token
    http.request(req)
 end
 ```
 
+## Postman:
+
+GET: http://localhost:3000/currencies/1
+
+Headers: KEY: Authorization VALUE: token
+
+# Delete Currency
+## Ruby:
+```
+require 'net/http'
+require 'json'
+
+uri = URI('http://localhost:3000/currencies/1')
+
+response = Net::HTTP.start(uri.host, uri.port) do |http|
+   req = Net::HTTP::Delete.new(uri)
+   req['Content-Type'] = 'application/json'
+   req['Authorization'] = token
+   http.request(req)
+end
+```
+
+## Postman:
+
+DELETE: http://localhost:3000/currencies/1
+
+Headers: KEY: Authorization VALUE: token
