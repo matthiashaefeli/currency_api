@@ -3,6 +3,7 @@ require 'json'
 
 class Connection
 
+  # get current currency states
   def self.live
     uri = URI('http://api.currencylayer.com/live?')
 
@@ -12,6 +13,7 @@ class Connection
     JSON.parse(response.body)
   end
 
+  # get Currencies names list
   def self.list
     uri = URI('http://api.currencylayer.com/list?')
 
