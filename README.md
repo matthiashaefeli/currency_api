@@ -159,6 +159,31 @@ GET: http://localhost:3000/currencies
 
 Headers: KEY: Authorization VALUE: token
 
+# Show all stored Currencie with filter and sort
+
+```
+require 'net/http'
+require 'json'
+
+uri = URI('http://localhost:3000/currencies')
+
+response = Net::HTTP.start(uri.host, uri.port) do |http|
+   req = Net::HTTP::Get.new(uri)
+   req['Content-Type'] = 'application/json'
+   req['Authorization'] = token
+   params = { filter: 'EUR', sort: 'value' }.to_json
+   http.request(req, params)
+end
+```
+
+## Postman:
+
+GET: http://localhost:3000/currencies
+
+Headers: KEY: Authorization VALUE: token
+
+Parmas: KEY: filter VALUE: 'EUR', KEY: sort VALUE: 'currency'
+
 # Show Currency
 ## Ruby:
 
