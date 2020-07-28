@@ -1,41 +1,50 @@
 class CurrenciesController < ApplicationController
   before_action :authenticate_request!
 
+  # get /currencies
   def index
     currencies = Currency.order(:created_at)
-    render json: currencies.as_json
+    render json: currencies, status: :ok
   end
 
+  # get /currencies/:id
   def show
     if !Currency.exists?(params[:id])
-      render json: { error: 'Currency with this id does not exists'}
+      payload = { error: 'Currency with this id does not exists',
+                  status: 400 }
+      render :json => payload, :status => :bad_request
     else
-      render json: Currency.find(params[:id]).as_json
+      render json: Currency.find(params[:id]), status: :ok
     end
   end
 
+  # post /currencies
   def create
-    binding.pry
-    currencies = Connection.live
-
-    currency = currencies['quotes'].select { |k, v| k == params[:currency] }.flatten
-    save_currency(params[:currency], currency[1])
-    # change currency name to real name
-    # currency[0] is the name for now but we have to change that
-
-    render json: {{ currency: currency[0], value: currency[1] }, status: :ok}
+    if CurrencyName.exists?(shortening: params[:currency])
+      currencies = Connection.live
+      currency = currencies['quotes'].select { |k, v| k == 'USD'+params[:currency] }.flatten
+      save_currency(params[:currency], currency[1])
+    else
+      payload =  { status: 400,
+                   error: "There is no currency with the name #{params[:currency]}" }
+      render :json => payload, :status => :bad_request
+    end
   end
 
+  # delete /currencies
   def destroy
     currency = Currency.find(params[:id])
     currency.delete
-    render json: { status: 200 }
+    render json: { status: 200 }, status: :ok
   end
 
   private
 
+  # save currency
   def save_currency(currency, value)
-    currency = Currency.new(currency: currency, value: value)
+    currency_name = CurrencyName.find_by(shortening: currency)
+    currency = Currency.new(currency: currency_name.title, value: value)
     currency.save
+    render json: currency, status: :created, location: currency
   end
 end
