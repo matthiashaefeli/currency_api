@@ -55,6 +55,10 @@ class CurrenciesController < ApplicationController
     render json: { status: 200 }, status: :ok
   end
 
+  def currency_names
+    render json: CurrencyName.pluck(:title, :shortening), status: :ok
+  end
+
   private
 
   # save currency

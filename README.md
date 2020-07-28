@@ -228,3 +228,25 @@ end
 DELETE: http://localhost:3000/currencies/1
 
 Headers: KEY: Authorization VALUE: token
+
+# Show all stored Currency names
+## Ruby:
+
+```
+require 'net/http'
+require 'json'
+
+uri = URI('http://localhost:3000/currencies/currency_names')
+
+response = Net::HTTP.start(uri.host, uri.port) do |http|
+   req = Net::HTTP::Get.new(uri)
+   req['Content-Type'] = 'application/json'
+   req['Authorization'] = token
+   http.request(req)
+end
+```
+## Postman:
+
+GET: http://localhost:3000/currencies/currency_names
+
+Headers: KEY: Authorization VALUE: token

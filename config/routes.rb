@@ -5,5 +5,9 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :currencies
+  resources :currencies do
+    collection do
+      get 'currency_names'
+    end
+  end
 end
