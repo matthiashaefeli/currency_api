@@ -119,4 +119,20 @@ RSpec.describe CurrenciesController, type: :controller do
       expect(response).to have_http_status(:ok)
     end
   end
+
+  describe 'currency_names' do
+    it 'error if not authenticated' do
+      get :currency_names
+      res = JSON.parse(response.body)
+      expect(res['error']).to eq('Invalid Request')
+    end
+
+    it 'returns collection of currency names' do
+      FactoryBot.create(:currency_name)
+      request.headers.merge!({ 'Authorization' => user_and_token })
+      get :currency_names
+      res = JSON.parse(response.body)
+      expect(res.size).to eq 1
+    end
+  end
 end
