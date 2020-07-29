@@ -8,9 +8,9 @@ class CurrenciesController < ApplicationController
       currencies =
         if params[:filter]
           currency_name = CurrencyName.find_by(shortening: params[:filter])
-          Currency.where(currency: currency_name.title)
+          Currency.where(currency: currency_name.title, user_id: @current_user)
         else
-          Currency.all
+          Currency.where(user_id: @current_user)
         end
 
       if params[:sort]
@@ -26,7 +26,8 @@ class CurrenciesController < ApplicationController
 
   # GET /currencies/:id
   def show
-    if !Currency.exists?(params[:id])
+    currency = Currency.where(id: params[:id], user_id: @current_user)
+    if currency.empty?
       payload = { error: 'Currency with this id does not exists',
                   status: 400 }
       render json: payload, status: :bad_request
@@ -50,9 +51,15 @@ class CurrenciesController < ApplicationController
 
   # DELETE /currencies
   def destroy
-    currency = Currency.find(params[:id])
-    currency.delete
-    render json: { status: 200 }, status: :ok
+    currency = Currency.find_by(id: params[:id], user_id: @current_user)
+    if currency
+      currency.delete
+      render json: { status: 200 }, status: :ok
+    else
+      payload = { error: 'Currency with this id does not exists',
+                  status: 400 }
+      render json: payload, status: :bad_request
+    end
   end
 
   def currency_names
@@ -64,7 +71,7 @@ class CurrenciesController < ApplicationController
   # save currency
   def save_currency(currency, value)
     currency_name = CurrencyName.find_by(shortening: currency)
-    currency = Currency.new(currency: currency_name.title, value: value)
+    currency = Currency.new(currency: currency_name.title, value: value, user_id: @current_user.id)
     currency.save
     render json: currency, status: :created, location: currency
   end
