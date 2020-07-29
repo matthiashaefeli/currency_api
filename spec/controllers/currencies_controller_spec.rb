@@ -9,7 +9,7 @@ RSpec.describe CurrenciesController, type: :controller do
     end
 
     it 'returns status 200' do
-      request.headers.merge!({ 'Authorization' => user_and_token })
+      request.headers.merge!({ 'Authorization' => user_and_token[0] })
       get :index
       expect(response.status).to eq 200
       expect(response).to have_http_status(:ok)
@@ -24,18 +24,20 @@ RSpec.describe CurrenciesController, type: :controller do
     end
 
     it 'returns collection of currencies' do
+      ut = user_and_token
       2.times do
-        FactoryBot.create(:currency)
+        FactoryBot.create(:currency, user_id: ut[1].id)
       end
-      request.headers.merge!({ 'Authorization' => user_and_token })
+      request.headers.merge!({ 'Authorization' => ut[0] })
       get :index
       res = JSON.parse(response.body)
       expect(res.size).to eq 2
     end
 
     it 'error with bad sort request' do
-      FactoryBot.create(:currency)
-      request.headers.merge!({ 'Authorization' => user_and_token })
+      ut = user_and_token
+      FactoryBot.create(:currency, user_id: ut[1].id)
+      request.headers.merge!({ 'Authorization' => ut[0] })
       get :index, params: { sort: 'bla' }
       res = JSON.parse(response.body)
       expect(res['error']).to eq 'Bad Request'
@@ -43,12 +45,25 @@ RSpec.describe CurrenciesController, type: :controller do
     end
 
     it 'error with bad filter request' do
-      FactoryBot.create(:currency)
-      request.headers.merge!({ 'Authorization' => user_and_token })
+      ut = user_and_token
+      FactoryBot.create(:currency, user_id: ut[1].id)
+      request.headers.merge!({ 'Authorization' => ut[0] })
       get :index, params: { filter: 'bla' }
       res = JSON.parse(response.body)
       expect(res['error']).to eq 'Bad Request'
       expect(response.status).to eq 400
+    end
+
+    it 'cant see other users currencies' do
+      ut1 = user_and_token
+      ut2 = user_and_token
+      2.times do
+        FactoryBot.create(:currency, user_id: ut1[1].id)
+      end
+      request.headers.merge!({ 'Authorization' => ut2[0] })
+      get :index
+      res = JSON.parse(response.body)
+      expect(res.size).to eq 0
     end
   end
 
@@ -60,8 +75,9 @@ RSpec.describe CurrenciesController, type: :controller do
     end
 
     it 'return json object' do
-      currency = FactoryBot.create(:currency)
-      request.headers.merge!({ 'Authorization' => user_and_token })
+      ut = user_and_token
+      currency = FactoryBot.create(:currency, user_id: ut[1].id)
+      request.headers.merge!({ 'Authorization' => ut[0] })
       get :show, params: { id: currency.id }
       expect(response.status).to eq 200
       res = JSON.parse(response.body)
@@ -69,7 +85,7 @@ RSpec.describe CurrenciesController, type: :controller do
     end
 
     it 'error if not exists' do
-      request.headers.merge!({ 'Authorization' => user_and_token })
+      request.headers.merge!({ 'Authorization' => user_and_token[0] })
       get :show, params: { id: 1 }
       expect(response.status).to eq 400
       res = JSON.parse(response.body)
@@ -86,7 +102,7 @@ RSpec.describe CurrenciesController, type: :controller do
 
     it 'creates new currency' do
       cn = FactoryBot.create(:currency_name)
-      request.headers.merge!({ 'Authorization' => user_and_token })
+      request.headers.merge!({ 'Authorization' => user_and_token[0] })
       post :create, params: { currency: cn.shortening }
       expect(response.status).to eq 201
       expect(response).to have_http_status(:created)
@@ -95,7 +111,7 @@ RSpec.describe CurrenciesController, type: :controller do
     end
 
     it 'currency does not exists' do
-      request.headers.merge!({ 'Authorization' => user_and_token })
+      request.headers.merge!({ 'Authorization' => user_and_token[0] })
       post :create, params: { currency: 'HHH' }
       expect(response.status).to eq 400
       expect(response).to have_http_status(:bad_request)
@@ -112,11 +128,22 @@ RSpec.describe CurrenciesController, type: :controller do
     end
 
     it 'delete currency' do
-      currency = FactoryBot.create(:currency)
-      request.headers.merge!({ 'Authorization' => user_and_token })
+      ut = user_and_token
+      currency = FactoryBot.create(:currency, user_id: ut[1].id)
+      request.headers.merge!({ 'Authorization' => ut[0] })
       delete :destroy, params: { id: currency.id }
       expect(response.status).to eq 200
       expect(response).to have_http_status(:ok)
+    end
+
+    it 'cant delete with wrong user' do
+      ut1 = user_and_token
+      ut2 = user_and_token
+      currency = FactoryBot.create(:currency, user_id: ut1[1].id)
+      request.headers.merge!({ 'Authorization' => ut2[0] })
+      delete :destroy, params: { id: currency.id }
+      expect(response.status).to eq 400
+      expect(response).to have_http_status(:bad_request)
     end
   end
 
@@ -129,7 +156,7 @@ RSpec.describe CurrenciesController, type: :controller do
 
     it 'returns collection of currency names' do
       FactoryBot.create(:currency_name)
-      request.headers.merge!({ 'Authorization' => user_and_token })
+      request.headers.merge!({ 'Authorization' => user_and_token[0] })
       get :currency_names
       res = JSON.parse(response.body)
       expect(res.size).to eq 1

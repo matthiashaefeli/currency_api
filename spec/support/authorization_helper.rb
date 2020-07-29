@@ -11,6 +11,6 @@ module AuthorizationHelper
     user = FactoryBot.create(:user)
     token = auth_tokens_for_user(user)
     @controller = CurrenciesController.new
-    token
+    [token, user]
   end
 end

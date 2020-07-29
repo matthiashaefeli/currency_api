@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 2020_07_28_031929) do
   create_table "currencies", force: :cascade do |t|
     t.string "currency"
     t.decimal "value"
+    t.integer "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
