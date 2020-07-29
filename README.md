@@ -1,8 +1,8 @@
 # Currency API
 
-Currency API provides a simple API, returns the value of a currency in json format.
+Currency API provides a simple API, returns the value of a currency in json format 1$ = returned currency.
 
-Stores the searched currency in the DB
+Stores the searched currency in the DB.
 
 # Requirements
 
@@ -34,7 +34,22 @@ $ rspec
 # Deploy to heroku
 
 ```
+$ heroku login
+$ heroku create api_name
+$ git config --list | grep heroku    # verify remote
+$ git push heroku master
+$ heroku ps:scale web=1   # ensure one dyno is running
+$ heroku ps # check dynos
+$ heroku run rake db:migrate
 ```
+
+Rails secret key config
+
+```
+$ cat config/master.key
+$ heroku config:set RAILS_MASTER_KEY=key
+```
+
 
 # Create a User
 ## Ruby:
@@ -43,7 +58,7 @@ $ rspec
 require 'net/http'
 require 'json'
 
-uri = URI('http://localhost:3000/users')
+uri = URI('http://mat-currency-api.herokuapp.com/users')
 
 response = Net::HTTP.start(uri.host, uri.port) do |http|
    req = Net::HTTP::Post.new(uri)
@@ -59,7 +74,7 @@ end
 
 ## Postman:
 
-POST: http://localhost:3000/users
+POST: http://mat-currency-api.herokuapp.com/users
 
 Headers: KEY: Content-Type VALUE: application/json
 
@@ -80,7 +95,7 @@ Body: raw
 require 'net/http'
 require 'json'
 
-uri = URI('http://localhost:3000/users/login')
+uri = URI('http://mat-currency-api.herokuapp.com/users/login')
 
 response = Net::HTTP.start(uri.host, uri.port) do |http|
    req = Net::HTTP::Post.new(uri)
@@ -98,7 +113,7 @@ token = JSON.parse(response.body)['auth_token']
 
 ## Postman:
 
-POST: http://localhost:3000/users/login
+POST: http://mat-currency-api.herokuapp.com/users/login
 
 Headers: KEY: Content-Type VALUE: application/json
 
@@ -119,7 +134,7 @@ Body: raw
 require 'net/http'
 require 'json'
 
-uri = URI('http://localhost:3000/currencies/?currency=CHF')
+uri = URI('http://mat-currency-api.herokuapp.com/currencies/?currency=CHF')
 
 response = Net::HTTP.start(uri.host, uri.port) do |http|
    req = Net::HTTP::Post.new(uri)
@@ -130,7 +145,7 @@ end
 ```
 ## Postman:
 
-POST: http://localhost:3000/currencies/
+POST: http://mat-currency-api.herokuapp.com/currencies/
 
 Headers: KEY: Authorization VALUE: token
 
@@ -144,7 +159,7 @@ PARAMS: KEY: currency VALUE: CHF
 require 'net/http'
 require 'json'
 
-uri = URI('http://localhost:3000/currencies')
+uri = URI('http://mat-currency-api.herokuapp.com/currencies')
 
 response = Net::HTTP.start(uri.host, uri.port) do |http|
    req = Net::HTTP::Get.new(uri)
@@ -155,7 +170,7 @@ end
 ```
 ## Postman:
 
-GET: http://localhost:3000/currencies
+GET: http://mat-currency-api.herokuapp.com/currencies
 
 Headers: KEY: Authorization VALUE: token
 
@@ -165,7 +180,7 @@ Headers: KEY: Authorization VALUE: token
 require 'net/http'
 require 'json'
 
-uri = URI('http://localhost:3000/currencies')
+uri = URI('http://mat-currency-api.herokuapp.com/currencies')
 
 response = Net::HTTP.start(uri.host, uri.port) do |http|
    req = Net::HTTP::Get.new(uri)
@@ -178,7 +193,7 @@ end
 
 ## Postman:
 
-GET: http://localhost:3000/currencies
+GET: http://mat-currency-api.herokuapp.com/currencies
 
 Headers: KEY: Authorization VALUE: token
 
@@ -191,7 +206,7 @@ Parmas: KEY: filter VALUE: 'EUR', KEY: sort VALUE: 'currency'
 require 'net/http'
 require 'json'
 
-uri = URI('http://localhost:3000/currencies/1)
+uri = URI('http://mat-currency-api.herokuapp.com/currencies/1)
 
 response = Net::HTTP.start(uri.host, uri.port) do |http|
    req = Net::HTTP::Get.new(uri)
@@ -203,7 +218,7 @@ end
 
 ## Postman:
 
-GET: http://localhost:3000/currencies/1
+GET: http://mat-currency-api.herokuapp.com/currencies/1
 
 Headers: KEY: Authorization VALUE: token
 
@@ -213,7 +228,7 @@ Headers: KEY: Authorization VALUE: token
 require 'net/http'
 require 'json'
 
-uri = URI('http://localhost:3000/currencies/1')
+uri = URI('http://mat-currency-api.herokuapp.com/currencies/1')
 
 response = Net::HTTP.start(uri.host, uri.port) do |http|
    req = Net::HTTP::Delete.new(uri)
@@ -225,7 +240,7 @@ end
 
 ## Postman:
 
-DELETE: http://localhost:3000/currencies/1
+DELETE: http://mat-currency-api.herokuapp.com/currencies/1
 
 Headers: KEY: Authorization VALUE: token
 
@@ -236,7 +251,7 @@ Headers: KEY: Authorization VALUE: token
 require 'net/http'
 require 'json'
 
-uri = URI('http://localhost:3000/currencies/currency_names')
+uri = URI('http://mat-currency-api.herokuapp.com/currencies/currency_names')
 
 response = Net::HTTP.start(uri.host, uri.port) do |http|
    req = Net::HTTP::Get.new(uri)
@@ -247,6 +262,6 @@ end
 ```
 ## Postman:
 
-GET: http://localhost:3000/currencies/currency_names
+GET: http://mat-currency-api.herokuapp.com/currencies/currency_names
 
 Headers: KEY: Authorization VALUE: token
